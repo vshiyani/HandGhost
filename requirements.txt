@@ -1,0 +1,7 @@
+opencv-python
+mediapipe
+pyautogui
+customtkinter
+Pillow
+numpy<2.0
+pyinstaller

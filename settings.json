@@ -1,0 +1,17 @@
+{
+    "camera_index": 0,
+    "pinch_threshold": 30.0,
+    "mouse_sensitivity": 6.6,
+    "smoothing_factor": 0.7,
+    "media_control_enabled": false,
+    "gestures": {
+        "activate_movement": "right_hand_index_pinch",
+        "left_click": "left_hand_index_pinch",
+        "right_click": "left_hand_middle_pinch",
+        "volume_up": "right_hand_swipe_up",
+        "volume_down": "right_hand_swipe_down",
+        "next_track": "right_hand_swipe_right",
+        "prev_track": "right_hand_swipe_left",
+        "mute": "right_hand_fist"
+    }
+}
