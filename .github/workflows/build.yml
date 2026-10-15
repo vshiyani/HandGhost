@@ -43,8 +43,56 @@ jobs:
       - name: Validate packaged Linux startup and shutdown
         if: runner.os == 'Linux'
         run: xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python scripts/smoke_desktop.py --executable dist/HandGhost/HandGhost
+      - name: Package release archive and checksum
+        run: python scripts/package_release.py --platform ${{ runner.os }} --arch ${{ runner.arch }}
       - uses: actions/upload-artifact@v4
         with:
           name: HandGhost-${{ runner.os }}-${{ runner.arch }}
           path: dist/HandGhost*
           if-no-files-found: error
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ runner.os }}-${{ runner.arch }}
+          path: release/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-assets-*
+          path: release
+          merge-multiple: true
+      - name: Verify archives and checksums
+        working-directory: release
+        run: |
+          test -f HandGhost-Windows-X64.zip
+          test -f HandGhost-Linux-X64.tar.gz
+          sha256sum --check HandGhost-Windows-X64.zip.sha256
+          sha256sum --check HandGhost-Linux-X64.tar.gz.sha256
+      - name: Publish downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes --title "HandGhost $RELEASE_TAG"
+          fi
+          gh release upload "$RELEASE_TAG" release/* --clobber
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            gh release edit "$RELEASE_TAG" --draft=false --prerelease
+          else
+            gh release edit "$RELEASE_TAG" --draft=false --prerelease=false --latest
+          fi

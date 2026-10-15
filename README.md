@@ -88,6 +88,21 @@ Windows produces `dist/HandGhost/HandGhost.exe`; Linux produces `dist/HandGhost/
 
 [CI](.github/workflows/build.yml) tests and builds Windows and Linux separately and uploads artifacts. Linux CI also verifies that the packaged app opens a window and exits cleanly. CI results are only established after the workflow runs; a local Linux build does not validate Windows.
 
+### GitHub Releases
+
+Pushing a version tag such as `v1.0.0` runs both native builds and automatically publishes a GitHub Release after both succeed. Merging a PR alone does not publish a release. After merging, tag the desired commit on `main`:
+
+```sh
+git switch main
+git pull --ff-only origin main
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Use a new version for each release. Tags containing a hyphen, such as `v1.0.0-beta.1`, publish as prereleases. The workflow uploads both archives to a draft before publishing, and supports retrying failed runs for the same tag.
+
+Download `HandGhost-Windows-X64.zip` or `HandGhost-Linux-X64.tar.gz` from the repository's **Releases** page. Extract the entire archive and run `HandGhost/HandGhost.exe` on Windows or `HandGhost/HandGhost` on Linux. The Linux tar archive preserves executable permissions. Each archive has a `.sha256` checksum file. Optional research model assets are installed separately in the app; they are not redistributed in these downloads.
+
 ## Implementation
 
 One paced background worker owns capture, model inference, and input dispatch. The UI consumes the latest frame from a single-slot mailbox, so slow rendering cannot accumulate stale frames. Hand mode uses MediaPipe's lite model at a default 640×480 / 30 fps, with palm-relative pinch thresholds, hysteresis, and two-frame activation. Eye mode runs the face/iris model and the selected optional appearance backend, fits a regularized calibration model, smooths gaze, and requires fresh open-eye observations before aiming. FPS and processing time are measured live; processing time is not a camera-to-screen latency measurement.
