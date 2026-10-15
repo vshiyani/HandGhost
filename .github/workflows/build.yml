@@ -31,10 +31,10 @@ jobs:
         env:
           HANDGHOST_TEST_DESKTOP: '1'
         if: runner.os == 'Linux'
-        run: xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python -m unittest discover -v
+        run: xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python scripts/run_tests.py
       - name: Test on Windows
         if: runner.os == 'Windows'
-        run: python -m unittest discover -v
+        run: python scripts/run_tests.py
       - name: Build native executable
         run: python -m PyInstaller --noconfirm --clean HandGhost.spec
       - name: Validate bundled model inference
