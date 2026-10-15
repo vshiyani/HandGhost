@@ -1,17 +1,26 @@
 {
-    "camera_index": 0,
-    "pinch_threshold": 30.0,
-    "mouse_sensitivity": 6.6,
-    "smoothing_factor": 0.7,
-    "media_control_enabled": false,
-    "gestures": {
-        "activate_movement": "right_hand_index_pinch",
-        "left_click": "left_hand_index_pinch",
-        "right_click": "left_hand_middle_pinch",
-        "volume_up": "right_hand_swipe_up",
-        "volume_down": "right_hand_swipe_down",
-        "next_track": "right_hand_swipe_right",
-        "prev_track": "right_hand_swipe_left",
-        "mute": "right_hand_fist"
-    }
+  "camera_index": 0,
+  "camera_width": 640,
+  "camera_height": 480,
+  "target_fps": 30,
+  "pinch_threshold": 30.0,
+  "mouse_sensitivity": 2.5,
+  "smoothing_factor": 0.45,
+  "media_control_enabled": false,
+  "controls_enabled": false,
+  "mirror_camera": true,
+  "tracking_mode": "hands",
+  "dwell_click_enabled": false,
+  "dwell_seconds": 1.2,
+  "eye_calibration": null,
+  "eye_model": "mediapipe",
+  "model_directory": "",
+  "eye_calibrations": {},
+  "gestures": {
+    "activate_movement": "right_hand_index_pinch",
+    "left_click": "left_hand_index_pinch",
+    "right_click": "left_hand_middle_pinch",
+    "scroll": "right_hand_middle_pinch",
+    "mute": "right_hand_fist"
+  }
 }

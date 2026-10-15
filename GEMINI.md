@@ -1,71 +1,15 @@
-# GEMINI.md: HandGhost Project
+# HandGhost development context
 
-This document provides context for the HandGhost project, an AI-powered hand-tracking desktop controller.
+HandGhost Studio is a Python 3.10–3.12 desktop application with separate hand and experimental eye modes. Read README.md and docs/usage.md before changing behavior.
 
-## Project Overview
+- `src/ui`: CustomTkinter studio, preferences, gesture guide, and nine-point eye calibration overlay. Tk widgets are accessed only on the main thread.
+- `src/tracking/worker.py`: paced camera/model/input worker with one latest-frame mailbox. Never queue an unbounded video backlog. Pause/stop release input under a lock independently of camera reads.
+- `src/gesture`: palm-relative pinch hysteresis, two-frame activation, drag release, scroll, and opt-in media events.
+- `src/eye/model_registry.py`, `appearance_models.py`, and `model_setup.py`: selectable MediaPipe/L2CS/GazeTR/iTracker backends. Optional upstream code/assets are checksum-pinned, installed outside the bundle, and carry separate licences. GazeTR is noncommercial; official iTracker assets prohibit redistribution. Never install random test weights as usable models.
+- `src/eye`: bundled FaceMesh iris landmarks, regularized calibration, gaze filtering, eye-closure gating, and optional dwell. Webcam gaze is approximate; don't claim measured accuracy from synthetic tests.
+- `src/interaction`: lazy PyAutoGUI backend. X11 supports desktop control; Wayland is preview-only. Keep fail-safe enabled except when releasing owned mouse buttons. Escape pauses only while the window has focus.
+- `src/utils/settings_manager.py`: validated snapshots and atomic per-user JSON saves. No startup writes to the checkout. Desktop control and dwell clicks start off every launch.
 
-HandGhost is a standalone desktop application that uses a computer's webcam to provide robust, gesture-based control over the mouse and media. It features a modern GUI that allows for extensive customization of gestures and sensitivity, with all settings saved between sessions.
+Install `requirements.txt` in a virtual environment. MediaPipe 0.10.21/OpenCV 4.11/NumPy <2 are compatibility pins for Solutions APIs. Run `python -m unittest discover -v`; UI tests need a graphical display. Linux CI uses Xvfb and HANDGHOST_TEST_DESKTOP=1 to test actual pointer input safely in an isolated display. Never opt into the pointer integration test on a user's real desktop.
 
-The application was developed iteratively, starting from a basic skeleton and evolving based on user feedback into a feature-rich, user-friendly tool.
-
-## Key Technologies
-
-*   **Core Logic:** Python
-*   **Hand Tracking:** MediaPipe
-*   **Computer Vision:** OpenCV
-*   **GUI:** CustomTkinter (for a modern look and feel)
-*   **OS Interaction:** PyAutoGUI
-*   **Packaging:** PyInstaller
-
-## Project Structure
-
-The codebase is organized into the following directories:
-
-*   `src`: Contains the main source code, including:
-    *   `ui/app_ui.py`: The main GUI application class.
-    *   `utils/settings_manager.py`: Handles loading and saving of user settings.
-    *   Modules for camera, detection, gesture recognition, rendering, and OS interaction.
-*   `docs`: Contains project documentation (`README.md`, `usage.md`).
-*   `HandGhost.spec`: The PyInstaller specification file for building the executable.
-*   `settings.json`: The default settings file, created on first run.
-
-## Running the Application
-
-There are two ways to run HandGhost:
-
-### 1. From Source Code
-
-This is recommended for development.
-
-**a. Setup Environment:**
-Install all necessary dependencies from the `requirements.txt` file.
-```bash
-pip install -r requirements.txt
-```
-
-**b. Run the Application:**
-Execute the `main.py` script.
-```bash
-python main.py
-```
-
-### 2. As a Standalone Executable
-
-This is the recommended way for end-users.
-
-**a. Build the Executable:**
-Use PyInstaller with the provided `.spec` file. This command bundles the application and all its dependencies into a single `.exe` file in the `dist` directory.
-```bash
-python -m PyInstaller HandGhost.spec --clean
-```
-
-**b. Run the Executable:**
-Navigate to the `dist` folder and run `HandGhost.exe`.
-
-## Gesture Customization and Settings
-
-HandGhost is highly customizable. A `settings.json` file is automatically created to store user preferences. The GUI provides an interface to:
--   Adjust mouse sensitivity and pinch detection thresholds.
--   Map different hand gestures (e.g., "left_hand_index_pinch") to various actions (e.g., "left_click", "activate_movement").
--   Enable/disable features like media controls.
--   Save settings to persist across application launches.
+Use `python main.py --diagnostics` for capabilities and `--check-models` for bundled model inference. Package using `python -m PyInstaller --noconfirm HandGhost.spec` on each target OS. CI builds Windows .exe and Linux ELF separately; no cross-compilation. Check packaged Linux GUI with `scripts/smoke_desktop.py --executable dist/HandGhost/HandGhost` under Xvfb. Hardware webcam/gaze accuracy and native Windows behavior still need manual validation.

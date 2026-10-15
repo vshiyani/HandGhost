@@ -1,64 +1,26 @@
 # -*- mode: python ; coding: utf-8 -*-
-import os
+# Build on each target OS; PyInstaller cannot cross-compile Windows/Linux bundles.
+from PyInstaller.utils.hooks import collect_data_files
 from pathlib import Path
+import sys
 
-# --- Function to get package path ---
-def get_package_path(package_name):
-    try:
-        import importlib
-        return Path(importlib.util.find_spec(package_name).origin).parent
-    except Exception as e:
-        print(f"Error getting path for {package_name}: {e}")
-        return None
+# Standalone Python builds may keep Tcl/Tk outside the system loader paths.
+tk_libraries = [(str(path), ".") for path in (Path(sys.base_prefix) / "lib").glob("libtcl*.so*")]
 
-# --- Find package paths ---
-mediapipe_path = get_package_path("mediapipe")
-customtkinter_path = get_package_path("customtkinter")
-
-# --- Prepare data files ---
-datas_to_include = []
-if mediapipe_path:
-    datas_to_include.extend([
-        (str(mediapipe_path / 'modules/hand_landmark'), 'mediapipe/modules/hand_landmark'),
-        (str(mediapipe_path / 'modules/palm_detection'), 'mediapipe/modules/palm_detection')
-    ])
-if customtkinter_path:
-    datas_to_include.append(
-        (str(customtkinter_path / 'assets'), 'customtkinter/assets')
-    )
-
-# --- PyInstaller Analysis ---
 a = Analysis(
-    ['main.py'],
-    pathex=[],
-    binaries=[],
-    datas=datas_to_include,
-    hiddenimports=[],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[],
-    noarchive=False,
-    optimize=0,
+    ['main.py'], pathex=[], binaries=tk_libraries,
+    datas=([(str(Path('src/eye/model_assets.json')), 'src/eye')] + collect_data_files('mediapipe', includes=['modules/**/*'])
+           + collect_data_files('customtkinter')),
+    hiddenimports=['PIL._tkinter_finder', 'torch.utils.model_zoo'],
+    hookspath=[], hooksconfig={}, runtime_hooks=[],
+    excludes=['IPython', 'pytest', 'tkinter.test'], noarchive=False, optimize=0,
 )
 pyz = PYZ(a.pure)
-
-# --- EXE for one-file build ---
 exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
-    [],
-    name='HandGhost',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    console=False,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    pyz, a.scripts, [], exclude_binaries=True, name='HandGhost',
+    debug=False, bootloader_ignore_signals=False, strip=False, upx=False,
+    console=False, disable_windowed_traceback=False,
 )
+
+# Folder bundle: avoid extracting the optional CPU frameworks at every launch.
+coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='HandGhost')

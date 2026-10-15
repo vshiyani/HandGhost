@@ -1,0 +1,3 @@
+# Install with --index-url https://download.pytorch.org/whl/cpu for CPU-only Linux/Windows wheels.
+torch==2.8.0
+torchvision==0.23.0

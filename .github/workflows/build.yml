@@ -1,0 +1,50 @@
+name: Test and build desktop apps
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y python3-tk libgl1 libglib2.0-0 xvfb xauth
+      - run: python -m pip install -r requirements.txt
+      - name: Install optional gaze inference engines
+        run: python -m pip install -r requirements-models.txt --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip check
+      - name: Test on Linux virtual desktop
+        env:
+          HANDGHOST_TEST_DESKTOP: '1'
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python -m unittest discover -v
+      - name: Test on Windows
+        if: runner.os == 'Windows'
+        run: python -m unittest discover -v
+      - name: Build native executable
+        run: python -m PyInstaller --noconfirm --clean HandGhost.spec
+      - name: Validate bundled model inference
+        if: runner.os == 'Linux'
+        run: dist/HandGhost/HandGhost --check-models
+      - name: Validate packaged Linux startup and shutdown
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' python scripts/smoke_desktop.py --executable dist/HandGhost/HandGhost
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HandGhost-${{ runner.os }}-${{ runner.arch }}
+          path: dist/HandGhost*
+          if-no-files-found: error
