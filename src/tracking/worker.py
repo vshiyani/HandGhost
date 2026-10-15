@@ -36,12 +36,14 @@ class TrackingWorker:
         detector_factory=HandDetector,
         interaction_factory=OSInteraction,
         eye_detector_factory=None,
+        gaze_controller_factory=GazeController,
     ):
         self.settings = settings_manager
         self._camera_factory = camera_factory
         self._detector_factory = detector_factory
         self._interaction_factory = interaction_factory
         self._eye_detector_factory = eye_detector_factory
+        self._gaze_controller_factory = gaze_controller_factory
         self.screen = None
         self._stop = threading.Event()
         self._lock = threading.Lock()
@@ -110,7 +112,7 @@ class TrackingWorker:
                 if eye_mode
                 else self._detector_factory()
             )
-            gaze = GazeController()
+            gaze = self._gaze_controller_factory()
             recognizer = GestureRecognizer(self.settings)
             renderer = GhostHandRenderer()
             interaction = self._interaction_factory(self.settings)

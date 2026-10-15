@@ -184,7 +184,8 @@ class EyeTracker:
 class GazeController:
     """Smooth aiming, closure gating, and opt-in dwell with move-to-rearm behavior."""
 
-    def __init__(self):
+    def __init__(self, clock=time.monotonic):
+        self._clock = clock
         self._position = None
         self._time = None
         self._anchor = None
@@ -205,7 +206,7 @@ class GazeController:
             self._last_click_position = None
 
     def update(self, observation, settings, screen, now=None):
-        now = time.monotonic() if now is None else now
+        now = self._clock() if now is None else now
         if self._time is not None and now - self._time > 0.25:
             self.reset()
         data = settings.get("eye_calibration")

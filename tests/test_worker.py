@@ -1,3 +1,4 @@
+import itertools
 import threading
 import unittest
 from unittest.mock import Mock
@@ -77,7 +78,7 @@ class TestTrackingWorker(unittest.TestCase):
         camera.release_camera.assert_called_once()
 
     def test_eye_mode_uses_only_eye_model_and_dispatches_aim(self):
-        from src.eye.gaze_tracker import EyeObservation
+        from src.eye.gaze_tracker import EyeObservation, GazeController
         from tests.test_eye_tracking import FEATURES, calibration
 
         self.settings.set_setting("tracking_mode", "eyes")
@@ -92,12 +93,14 @@ class TestTrackingWorker(unittest.TestCase):
         dispatched = threading.Event()
         interaction.perform_action.side_effect = lambda event: dispatched.set()
         hand_factory = Mock()
+        timestamps = itertools.count(0, 0.05)
         worker = TrackingWorker(
             self.settings,
             lambda index: camera,
             hand_factory,
             lambda settings: interaction,
             eye_detector_factory=lambda: detector,
+            gaze_controller_factory=lambda: GazeController(clock=lambda: next(timestamps)),
         )
         worker.screen = (1600, 1000)
         from unittest.mock import patch
@@ -106,7 +109,11 @@ class TestTrackingWorker(unittest.TestCase):
             capability.return_value.available = True
             worker.start()
             try:
-                self.assertTrue(dispatched.wait(3), worker.error)
+                self.assertTrue(
+                    dispatched.wait(3),
+                    f"{worker.error}; eye frames={detector.detect.call_count}; "
+                    f"controls={self.settings.get_setting('controls_enabled')}",
+                )
             finally:
                 worker.stop()
                 worker.thread.join(3)

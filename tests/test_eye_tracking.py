@@ -138,3 +138,12 @@ class TestGazeController(unittest.TestCase):
         self.update(0.3)
         self.assertEqual(self.update(2), [])
         self.assertEqual(self.controller.progress, 0)
+
+    def test_injected_clock_preserves_activation_and_stale_frame_guards(self):
+        timestamps = iter((0, 0.1, 0.3, 1))
+        controller = GazeController(clock=lambda: next(timestamps))
+        self.assertEqual(controller.update(self.observation, self.settings, self.screen), [])
+        self.assertEqual(controller.update(self.observation, self.settings, self.screen), [])
+        events = controller.update(self.observation, self.settings, self.screen)
+        self.assertEqual([event.type for event in events], ["move_absolute"])
+        self.assertEqual(controller.update(self.observation, self.settings, self.screen), [])
