@@ -1,9 +1,11 @@
 import logging
 
+
 class Logger:
     """
     A simple logger class.
     """
+
     _loggers = {}
 
     @staticmethod

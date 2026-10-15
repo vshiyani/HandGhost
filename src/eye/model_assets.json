@@ -1,0 +1,57 @@
+{
+  "l2cs/model.py": {
+    "url": "https://raw.githubusercontent.com/Ahmednull/L2CS-Net/a4d8f7fa5436a2b2b9f088471623b552a85811bd/l2cs/model.py",
+    "sha256": "2fcf682d880bc22a4686b22ff89d48d0a46429ce47e6025a3aeaf1e6fb6fc2c0",
+    "bytes": 2625
+  },
+  "l2cs/LICENSE": {
+    "url": "https://raw.githubusercontent.com/Ahmednull/L2CS-Net/a4d8f7fa5436a2b2b9f088471623b552a85811bd/LICENSE",
+    "sha256": "fee4412d8f04aa84eb629e9631d1c067fee9454247ef016e8667768b6bc7488c",
+    "bytes": 1074
+  },
+  "gazetr/model.py": {
+    "url": "https://raw.githubusercontent.com/yihuacheng/GazeTR/d7cf716c9b0f410761ace86aa30439eeca5361da/model.py",
+    "sha256": "aee3578b4feea5727d10f3acf3bac9f8f3303b3c651d8f50f05f42a88385c4ea",
+    "bytes": 3791
+  },
+  "gazetr/resnet.py": {
+    "url": "https://raw.githubusercontent.com/yihuacheng/GazeTR/d7cf716c9b0f410761ace86aa30439eeca5361da/resnet.py",
+    "sha256": "7ea045951e10b04e91f06e204f1e7098826e315ee2e8ec6b56ecffd65a8839e6",
+    "bytes": 4780
+  },
+  "gazetr/README.md": {
+    "url": "https://raw.githubusercontent.com/yihuacheng/GazeTR/d7cf716c9b0f410761ace86aa30439eeca5361da/README.md",
+    "sha256": "b64ca1a7c57e3f9f503cd8c77b2ef66d6adf45bd95383f2a6177da05e3f1f568",
+    "bytes": 4022
+  },
+  "itracker/itracker_deploy.prototxt": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/models/itracker_deploy.prototxt",
+    "sha256": "93a984a55829f07813859a068d9bf30ec8b3161d7121f715a9a9124b34cfdb76",
+    "bytes": 8839
+  },
+  "itracker/weights.caffemodel": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/models/snapshots/itracker_iter_92000.caffemodel",
+    "sha256": "93f4c9f96395db024dd256525b5e2bba59f592e4724a99ecbb327edd9684b8e8",
+    "bytes": 32616382
+  },
+  "itracker/LICENSE.md": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/LICENSE.md",
+    "sha256": "03579733e603ace9d03bb9a705428aeadc4e4e57849571059703e1012d74941d",
+    "bytes": 6851
+  },
+  "itracker/mean_face_224.mat": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/models/mean_images/mean_face_224.mat",
+    "sha256": "43dccf2f655259b23d3b2cd20907f5d7479e175215caba6bb310d3a4c3fc4756",
+    "bytes": 506824
+  },
+  "itracker/mean_left_224.mat": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/models/mean_images/mean_left_224.mat",
+    "sha256": "b502c0c7392cea761688625f2be8b0359fc9df74599ef744ce37b7dc68dcb470",
+    "bytes": 509839
+  },
+  "itracker/mean_right_224.mat": {
+    "url": "https://raw.githubusercontent.com/CSAILVision/GazeCapture/e4af90da3c4c9068fbce433fa648d1f9bc7a394b/models/mean_images/mean_right_224.mat",
+    "sha256": "15167a33bc553cf624869be2717129362ea2a3445ba26676927a6f63205e2ef0",
+    "bytes": 508008
+  }
+}
