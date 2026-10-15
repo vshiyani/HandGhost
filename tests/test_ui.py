@@ -1,5 +1,6 @@
 """GUI smoke checks run under Xvfb or a real graphical session."""
 
+import gc
 import os
 import tempfile
 import unittest
@@ -50,6 +51,10 @@ class TestUI(unittest.TestCase):
         if self.app.winfo_exists():
             self.app.on_closing()
             self.app.update()
+        # Tk objects must be finalized on their owning thread. Leaving widget
+        # cycles for a later worker allocation can block Tcl cleanup on Windows.
+        self.app = None
+        gc.collect()
 
     def test_navigation_preview_opt_in_pause_and_save(self):
         app = self.app

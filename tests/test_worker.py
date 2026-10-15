@@ -1,5 +1,7 @@
 import itertools
+import sys
 import threading
+import traceback
 import unittest
 from unittest.mock import Mock
 
@@ -117,6 +119,12 @@ class TestTrackingWorker(unittest.TestCase):
             finally:
                 worker.stop()
                 worker.thread.join(3)
+            if worker.running:
+                frame = sys._current_frames().get(worker.thread.ident)
+                self.fail(
+                    "Eye worker did not finish shutdown:\n"
+                    + ("".join(traceback.format_stack(frame)) if frame else worker.error)
+                )
         hand_factory.assert_not_called()
         self.assertEqual(interaction.perform_action.call_args.args[0].type, "move_absolute")
         detector.close.assert_called_once()
